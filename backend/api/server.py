@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from api.routers import interview, health,auth,llm,skills,role_profile
+from api.routers import interview, health,auth,llm,skills,role
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
@@ -26,7 +26,7 @@ def create_app() -> FastAPI:
 
     app.include_router(skills.router, prefix="/api")
 
-    app.include_router(role_profile.router, prefix="/api")
+    app.include_router(role.router, prefix="/api")
 
     return app
 
