@@ -1,0 +1,45 @@
+[tool.poetry]
+name = "jd-interview-gen-backend"
+version = "0.1.0"
+description = "Interview Question Generator Backend using FastAPI + LangChain"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [
+    { include = "api" },
+    { include = "core" },
+    { include = "pipelines" },
+    { include = "models" },
+    { include = "services"}
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+fastapi = "^0.110.0"
+uvicorn = { extras = ["standard"], version = "^0.29.0" }
+sse-starlette = "^1.6.1"
+
+python-dotenv = "^1.0.1"
+pydantic = "^2.6.0"
+pydantic-settings = "^2.1.0"
+
+langchain-core = "^0.2.20"
+langchain-openai = "^0.1.20"
+
+openai = "^1.14.0"
+aiohttp = "^3.9.3"
+
+psycopg2-binary = "^2.9.9"
+sqlalchemy = "^2.0.28"
+python-jose = "^3.5.0"
+passlib = "^1.7.4"
+pydantic-extra-types = "^2.10.6"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.4"
+black = "^24.3.0"
+ruff = "^0.3.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
