@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { h, ref } from 'vue'
+import { h, ref, watch } from 'vue'
 import { NIcon } from 'naive-ui'
 import type { MenuOption } from 'naive-ui'
 import {
@@ -56,7 +56,22 @@ import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
 const route = useRoute()
-const activeKey = ref<string>(route.path === '/' ? 'dashboard' : route.name as string)
+
+const resolveMenuKey = (name: unknown) => {
+  if (name === 'prompts-create') {
+    return 'prompts'
+  }
+  return typeof name === 'string' ? name : 'dashboard'
+}
+
+const activeKey = ref<string>(resolveMenuKey(route.name))
+
+watch(
+  () => route.name,
+  (name) => {
+    activeKey.value = resolveMenuKey(name)
+  }
+)
 
 function renderIcon(icon: any) {
   return () => h(NIcon, null, { default: () => h(icon) })
@@ -74,18 +89,21 @@ const menuOptions: MenuOption[] = [
     icon: renderIcon(TimeOutline)
   },
   {
-    label: '全局设置',
+    label: '模型配置',
     key: 'settings',
     icon: renderIcon(SettingsOutline)
+  },
+  {
+    label: 'Prompt 管理',
+    key: 'prompts',
+    icon: renderIcon(StarOutline)
   }
 ]
 
 function handleUpdateValue(key: string) {
   activeKey.value = key
-  if (key === 'dashboard') {
-    router.push('/')
-  } else if (key === 'history') {
-    router.push('/history')
+  if (key === 'dashboard' || key === 'history' || key === 'settings' || key === 'prompts') {
+    router.push({ name: key })
   } else {
     // For demo purposes
     console.log('Navigate to', key)
