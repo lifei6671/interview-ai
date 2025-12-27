@@ -2,7 +2,7 @@
   <div class="welcome-banner">
     <div class="content">
       <h1 class="title">开始新的任务</h1>
-      <p class="description">配置多种OCR引擎与AI翻译模型，上传文档后，Paper Burner X将给您流畅的阅读与处理体验。</p>
+      <p class="description">开始一个新任务，选择不同模型和 Prompt 生成面试题。</p>
     </div>
     <div class="illustration">
       <!-- Placeholder for illustration -->

@@ -3,6 +3,9 @@ import MainLayout from '../layout/MainLayout.vue'
 import Dashboard from '../views/Dashboard.vue'
 import History from '../views/History.vue'
 import Login from '../views/Login.vue'
+import Settings from '../views/Settings.vue'
+import Prompts from '../views/Prompts.vue'
+import PromptsCreate from '../views/PromptsCreate.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -11,19 +14,34 @@ const routes: Array<RouteRecordRaw> = [
     children: [
       {
         path: '',
-        name: 'Dashboard',
+        name: 'dashboard',
         component: Dashboard
       },
       {
         path: 'history',
-        name: 'History',
+        name: 'history',
         component: History
+      },
+      {
+        path: 'settings',
+        name: 'settings',
+        component: Settings
+      },
+      {
+        path: 'prompts',
+        name: 'prompts',
+        component: Prompts
+      },
+      {
+        path: 'prompts/new',
+        name: 'prompts-create',
+        component: PromptsCreate
       }
     ]
   },
   {
     path: '/login',
-    name: 'Login',
+    name: 'login',
     component: Login
   }
 ]

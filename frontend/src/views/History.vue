@@ -10,11 +10,6 @@
           <div class="subtitle">查看和管理您处理过的文档</div>
         </div>
       </div>
-      <n-button quaternary circle size="small" @click="handleClose">
-        <template #icon>
-          <n-icon><CloseOutline /></n-icon>
-        </template>
-      </n-button>
     </div>
 
     <div class="history-content">
@@ -111,7 +106,6 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   TimeOutline,
-  CloseOutline,
   AddOutline,
   PencilOutline,
   TrashOutline,
@@ -161,10 +155,6 @@ const showAddModal = computed({
   }
 })
 
-// Handlers
-const handleClose = () => {
-  router.push('/')
-}
 
 const handleEdit = (folder: Folder) => {
   modalMode.value = 'edit'
