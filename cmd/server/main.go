@@ -11,7 +11,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gin-gonic/gin"
+	"github.com/lifei6671/interview-ai/actions"
 	"github.com/lifei6671/interview-ai/server"
 	"github.com/lifei6671/logit"
 )
@@ -30,9 +30,7 @@ func main() {
 
 	ser := server.New(rootCtx, "", server.WithLogitLogger(logger))
 
-	ser.AddRoute(http.MethodGet, "/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"message": "success", "source": "Gin"})
-	})
+	actions.HttpRouter(ser)
 
 	// Serve 放到 goroutine，主 goroutine 负责 shutdown
 	errCh := make(chan error, 1)

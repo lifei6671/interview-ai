@@ -35,6 +35,9 @@ type Server interface {
 	Shutdown(ctx context.Context) error
 	AddRoute(httpMethod, relativePath string, handler gin.HandlerFunc)
 	GetHandler() http.Handler
+
+	Router() gin.IRoutes
+	Engine() *gin.Engine
 }
 
 type Option func(*DefaultServer)
@@ -105,6 +108,13 @@ type DefaultServer struct {
 	allowSensitiveDump  bool
 	serverErrorLogStack bool
 	served              atomic.Bool // Serve() 调用后置 true，禁止再 AddRoute
+}
+
+func (s *DefaultServer) Engine() *gin.Engine {
+	return s.s
+}
+func (s *DefaultServer) Router() gin.IRoutes {
+	return s.s
 }
 
 func New(ctx context.Context, addr string, options ...Option) Server {
