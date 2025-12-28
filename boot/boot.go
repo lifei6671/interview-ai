@@ -6,22 +6,24 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/gin-gonic/gin"
 	"github.com/lifei6671/go-config"
 	"github.com/lifei6671/go-config/decoder"
 	"github.com/lifei6671/interview-ai/boot/configloc"
 )
 
 const (
-	// RunModeDev 开发环境
-	RunModeDev = "dev"
+	// RunModeDebug 开发环境
+	RunModeDebug = gin.DebugMode
 	// RunModeTest 测试环境
-	RunModeTest = "test"
-	// RunModeProd 生成环境
-	RunModeProd = "prod"
+	RunModeTest = gin.TestMode
+	// RunModeRelease 生成环境
+	RunModeRelease = gin.ReleaseMode
 )
 
 // AppConfig 服务配置
 type AppConfig struct {
+	AppName string `json:"AppName,omitempty" yaml:"AppName" toml:"AppName"`
 	// 运行模式
 	RunMode string `json:"RunMode,omitempty" yaml:"RunMode" toml:"RunMode"`
 	// 服务监听地址
@@ -105,8 +107,6 @@ func MustLoadServerConfig(filename string) (*AppConfig, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unmarshal config fail from %s: %w", filename, err)
 	}
-
-	log.Println(c.RunMode)
 	if c.RootDir == "" {
 		c.RootDir = execDir
 	}
@@ -116,6 +116,10 @@ func MustLoadServerConfig(filename string) (*AppConfig, error) {
 	if c.ConfDir == "" {
 		c.ConfDir = filepath.Join(c.RootDir, "conf")
 	}
+	if c.AppName == "" {
+		c.AppName = "interview-ai"
+	}
+	Print(c)
 	return &c, nil
 }
 
@@ -134,4 +138,43 @@ func DetectAppDir(cfgArg string) (string, error) {
 		return "", err
 	}
 	return dir, nil
+}
+
+func Print(e AppConfig) {
+	type data struct {
+		Key   string
+		Value string
+	}
+	kvs := []data{
+		{
+			Key:   "AppName",
+			Value: e.AppName,
+		},
+		{
+			Key:   "Listen",
+			Value: e.Listen,
+		},
+		{
+			Key:   "RunMode",
+			Value: e.RunMode,
+		},
+		{
+			Key:   "RootDir",
+			Value: e.RootDir,
+		},
+		{
+			Key:   "ConfDir",
+			Value: e.ConfDir,
+		},
+		{
+			Key:   "LogDir",
+			Value: e.LogDir,
+		},
+	}
+	bs := &strings.Builder{}
+	bs.WriteString("AppConfig:\n")
+	for _, kv := range kvs {
+		bs.WriteString(fmt.Sprintf("%20s\t%q\n", kv.Key, kv.Value))
+	}
+	_ = log.Output(2, bs.String())
 }

@@ -2,10 +2,10 @@
 Listen = "0.0.0.0:${env.LISTEN_PORT|8081}"
 
 # 运行模式
-# dev: 运行模式为开发环境
+# debug: 运行模式为开发环境
 # test: 运行模式为测试环境
-# prod: 运行模式为生产环境
-RunMode = "${env.RUN_MODE|prod}"
+# release: 运行模式为生产环境
+RunMode = "${env.RUN_MODE|debug}"
 
 [LogConfig]
 #   日志文件切换规则

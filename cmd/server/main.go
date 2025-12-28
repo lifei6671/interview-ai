@@ -12,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/lifei6671/interview-ai/actions"
 	"github.com/lifei6671/interview-ai/boot"
 	"github.com/lifei6671/interview-ai/server"
@@ -31,11 +32,8 @@ func main() {
 		log.Println("Failed to load server config:", err)
 		os.Exit(1)
 	}
-	log.Printf("App listen %s", appConfig.Listen)
-	log.Printf("App run mode:%s", appConfig.RunMode)
-	log.Printf("App root dir:%s", appConfig.RootDir)
-	log.Printf("App conf dir:%s", appConfig.ConfDir)
-	log.Printf("App log dir:%s", appConfig.LogDir)
+
+	gin.SetMode(appConfig.RunMode)
 
 	logger := logit.New(logit.Config{ToStdout: true})
 
