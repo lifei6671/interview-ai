@@ -1,70 +1,74 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"log"
+	"net"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"github.com/lifei6671/interview-ai/server"
+	"github.com/lifei6671/logit"
 )
 
-// Greeting model for Gorm verification
-type Greeting struct {
-	gorm.Model
-	Message string
-}
-
 func main() {
-	// Database Connection
-	// Note: using localhost because we are running outside the container, connecting to exposed port
-	dsn := "host=localhost user=admin password=admin123 dbname=jd_interview port=5432 sslmode=disable"
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	rootCtx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
+
+	logger := logit.New(logit.Config{ToStdout: true})
+
+	l, err := net.Listen("tcp", ":8080")
 	if err != nil {
-		log.Printf("Warning: failed to connect database: %v. Database features will be disabled.", err)
-	} else {
-		// Migrate the schema
-		if err := db.AutoMigrate(&Greeting{}); err != nil {
-			log.Printf("Warning: failed to migrate database: %v", err)
-		} else {
-			// Create a default greeting if not exists (just for demo)
-			var count int64
-			db.Model(&Greeting{}).Count(&count)
-			if count == 0 {
-				db.Create(&Greeting{Message: "Hello from Gorm!"})
-			}
-		}
+		log.Println("Failed to listen:", err)
+		os.Exit(1)
 	}
 
-	// Gin Router
-	r := gin.Default()
+	ser := server.New(rootCtx, "", server.WithLogitLogger(logger))
 
-	// Hello World Endpoint
-	r.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Hello World from Gin!",
-		})
+	ser.AddRoute(http.MethodGet, "/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"message": "success", "source": "Gin"})
 	})
 
-	// Endpoint to get greeting from DB
-	r.GET("/db-hello", func(c *gin.Context) {
-		if db == nil || db.Error != nil {
-			c.JSON(http.StatusServiceUnavailable, gin.H{"error": "Database not connected"})
-			return
-		}
-		var greeting Greeting
-		if result := db.First(&greeting); result.Error != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
-			return
-		}
-		c.JSON(http.StatusOK, gin.H{
-			"message": greeting.Message,
-			"source":  "PostgreSQL",
-		})
-	})
+	// Serve 放到 goroutine，主 goroutine 负责 shutdown
+	errCh := make(chan error, 1)
+	go func() {
+		log.Println("Server starting on :8080")
+		errCh <- ser.Serve(l)
+	}()
 
-	log.Println("Server starting on :8080")
-	if err := r.Run(":8080"); err != nil {
-		log.Fatal("Server failed to start: ", err)
+	select {
+	case <-rootCtx.Done():
+		// 收到退出信号
+		log.Println("Shutdown signal received")
+	case err := <-errCh:
+		// Serve 提前返回（启动失败/运行异常）
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Println("Server stopped unexpectedly:", err)
+			os.Exit(1)
+		}
+		return
 	}
+
+	// 优雅退出：给一个超时窗口
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := ser.Shutdown(shutdownCtx); err != nil {
+		log.Println("Graceful shutdown failed:", err)
+		os.Exit(1)
+	}
+
+	// 等 Serve 返回，避免主进程提前退出
+	serErr := <-errCh
+	if err != nil && !errors.Is(serErr, http.ErrServerClosed) {
+		log.Println("Server stopped with error:", serErr)
+		os.Exit(1)
+	}
+
+	log.Println("Server exited gracefully")
 }
