@@ -1,0 +1,41 @@
+# 服务监听地址
+Listen = "0.0.0.0:${env.LISTEN_PORT|8081}"
+
+# 运行模式
+# dev: 运行模式为开发环境
+# test: 运行模式为测试环境
+# prod: 运行模式为生产环境
+RunMode = "${env.RUN_MODE|prod}"
+
+[LogConfig]
+#   日志文件切换规则
+# 	1hour -> 1小时  后缀如  .2025040117
+#	1day  -> 1天    后缀如  .20250401
+#	no    -> 无后缀
+#	1min  -> 1分钟  后缀如  .202504011700  .202504011701  .202504011702  .202504011759
+#	5min  -> 5分钟  后缀如  .202504011700  .202504011705  .202504011710  .202504011715
+#	10min -> 10分钟 后缀如  .202504011700  .202504011710  .202504011720  .202504011750
+#	30min -> 30分钟 后缀如  .202504011700  .202504011730
+RuleName = "1hour"
+
+# 日志文件名
+Filename = "service/service.log"
+
+[[LogConfig.DispatchRule]]
+# 日志级别
+# debug: 输出所有日志
+# info: 输出 info 及以上级别的日志
+# warn: 输出 warn 及以上级别的日志
+# error: 输出 error 及以上级别的日志
+# fatal: 输出 fatal 及以上级别的日志
+Levels = ["info"]
+# 日志文件后缀,和日志文件名一起组成文件名： service/service.log.2025040117
+FileSuffix = ""
+
+# 日志编码格式: json/console
+Encoder = "json"
+
+[[LogConfig.DispatchRule]]
+Levels = ["warn","error","fatal"]
+FileSuffix = ".wf"
+Encoder = "json"

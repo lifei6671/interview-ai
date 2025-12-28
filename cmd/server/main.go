@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"flag"
 	"log"
 	"net"
 	"net/http"
@@ -12,17 +13,33 @@ import (
 	"time"
 
 	"github.com/lifei6671/interview-ai/actions"
+	"github.com/lifei6671/interview-ai/boot"
 	"github.com/lifei6671/interview-ai/server"
 	"github.com/lifei6671/logit"
 )
 
+var configFile = flag.String("config", "conf/app.toml", "path to config file")
+
 func main() {
+	flag.Parse()
+
 	rootCtx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
+	appConfig, err := boot.MustLoadServerConfig(*configFile)
+	if err != nil {
+		log.Println("Failed to load server config:", err)
+		os.Exit(1)
+	}
+	log.Printf("App listen %s", appConfig.Listen)
+	log.Printf("App run mode:%s", appConfig.RunMode)
+	log.Printf("App root dir:%s", appConfig.RootDir)
+	log.Printf("App conf dir:%s", appConfig.ConfDir)
+	log.Printf("App log dir:%s", appConfig.LogDir)
+
 	logger := logit.New(logit.Config{ToStdout: true})
 
-	l, err := net.Listen("tcp", ":8080")
+	l, err := net.Listen("tcp", appConfig.Listen)
 	if err != nil {
 		log.Println("Failed to listen:", err)
 		os.Exit(1)
@@ -35,7 +52,7 @@ func main() {
 	// Serve 放到 goroutine，主 goroutine 负责 shutdown
 	errCh := make(chan error, 1)
 	go func() {
-		log.Println("Server starting on :8080")
+		log.Printf("Server starting on %s", appConfig.Listen)
 		errCh <- ser.Serve(l)
 	}()
 
@@ -57,7 +74,7 @@ func main() {
 	defer cancel()
 
 	if err := ser.Shutdown(shutdownCtx); err != nil {
-		log.Println("Graceful shutdown failed:", err)
+		log.Printf("Graceful shutdown failed:%v", err)
 		os.Exit(1)
 	}
 
@@ -69,4 +86,8 @@ func main() {
 	}
 
 	log.Println("Server exited gracefully")
+}
+
+func init() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
 }
