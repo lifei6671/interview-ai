@@ -96,7 +96,7 @@ const strategyOptions = [
   { label: '反向工程', value: 'reverse-engineering',desc:"你如何从现象反推 Redis 出现阻塞的根因？" },
   { label: '机制替代', value: 'mechanism-replacement',desc:"为什么 Go 要采用 CSP，而不是 Actor Model？" },
   { label: '边界与极限', value: 'boundary-case',desc:"在极端网络抖动环境下，TCP 的 TIME_WAIT 会发生什么变化？" },
-  {label:'对比策略',value:'comparative-reason',desc:"在相同负载下，为什么 Kafka 的吞吐可以比 RabbitMQ 高？" },
+  { label: '对比策略', value:'comparative-reason',desc:"在相同负载下，为什么 Kafka 的吞吐可以比 RabbitMQ 高？" },
   { label: '系统化问题', value: 'system-level-thinking',desc:"如果服务间依赖链增长，你的链路追踪方案如何保持可观测性？" },
   { label: '假设故障', value: 'failure-injection',desc:"如果 Redis 的热点 key 访问量突然增长 100 倍，你如何定位瓶颈？" },
   { label: '隐含代价', value: 'hidden-cost',desc:"为什么过度使用 goroutine 反而会降低性能？" },
