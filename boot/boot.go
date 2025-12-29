@@ -50,6 +50,14 @@ type LogConfig struct {
 	Filename string `json:"Filename,omitempty" yaml:"Filename" toml:"Filename"`
 	// 日志分发规则名称
 	RuleName string `json:"RuleName,omitempty" yaml:"RuleName" toml:"RuleName"`
+	// 日志刷新间隔
+	FlushDuration int `json:"FlushDuration,omitempty" yaml:"FlushDuration" toml:"FlushDuration"`
+	// 日志检查间隔，定时检查日志文件是否被删除
+	CheckDuration int `json:"CheckDuration,omitempty" yaml:"CheckDuration" toml:"CheckDuration"`
+	// 保存的最大文件数量，多于该数量则清理，如果为0则忽略
+	MaxFileNum int
+	// 日志缓冲区大小
+	BufferSize int
 	// 日志分发规则
 	DispatchRule []LogDispatchRule `json:"DispatchRule,omitempty" yaml:"DispatchRule" toml:"DispatchRule"`
 }
@@ -123,6 +131,7 @@ func MustLoadServerConfig(filename string) (*AppConfig, error) {
 	return &c, nil
 }
 
+// DetectAppDir 检测应用目录
 func DetectAppDir(cfgArg string) (string, error) {
 
 	res, err := configloc.Resolve(configloc.Options{
@@ -140,6 +149,7 @@ func DetectAppDir(cfgArg string) (string, error) {
 	return dir, nil
 }
 
+// Print 打印服务配置
 func Print(e AppConfig) {
 	type data struct {
 		Key   string

@@ -140,6 +140,7 @@ func New(ctx context.Context, addr string, options ...Option) Server {
 	}
 
 	engine := gin.New()
+	engine.ContextWithFallback = true
 	engine.Use(
 		GinWithContextMeta(DefaultContextMetaOptions()),
 		ginWithLogger(s.Logger),

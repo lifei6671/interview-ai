@@ -8,6 +8,8 @@ Listen = "0.0.0.0:${env.LISTEN_PORT|8081}"
 RunMode = "${env.RUN_MODE|debug}"
 
 [LogConfig]
+# 日志文件切换规则
+
 #   日志文件切换规则
 # 	1hour -> 1小时  后缀如  .2025040117
 #	1day  -> 1天    后缀如  .20250401
@@ -16,12 +18,26 @@ RunMode = "${env.RUN_MODE|debug}"
 #	5min  -> 5分钟  后缀如  .202504011700  .202504011705  .202504011710  .202504011715
 #	10min -> 10分钟 后缀如  .202504011700  .202504011710  .202504011720  .202504011750
 #	30min -> 30分钟 后缀如  .202504011700  .202504011730
-RuleName = "1hour"
+RuleName = "1min"
+
+# 日志刷新间隔,单位秒
+FlushDuration = 1
+
+# 日志检查间隔,单位秒
+CheckDuration = 5
+
+# 日志文件最大数量
+MaxFileNum = 5
+
+# 日志缓存大小
+BufferSize = 4096
 
 # 日志文件名
-Filename = "service/service.log"
+Filename = "log/service/service.log"
 
 [[LogConfig.DispatchRule]]
+# 日志分流规则
+
 # 日志级别
 # debug: 输出所有日志
 # info: 输出 info 及以上级别的日志

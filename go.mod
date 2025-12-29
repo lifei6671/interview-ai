@@ -5,7 +5,7 @@ go 1.25.0
 require (
 	github.com/gin-gonic/gin v1.11.0
 	github.com/lifei6671/go-config v0.1.1
-	github.com/lifei6671/logit v0.3.0
+	github.com/lifei6671/logit v0.4.0
 	go.uber.org/zap v1.27.1
 )
 

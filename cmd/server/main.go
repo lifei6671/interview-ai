@@ -35,7 +35,12 @@ func main() {
 
 	gin.SetMode(appConfig.RunMode)
 
-	logger := logit.New(logit.Config{ToStdout: true})
+	logger, closeFunc, err := boot.MustLogger(appConfig)
+	if err != nil {
+		log.Println("Failed to create logger:", err)
+		os.Exit(1)
+	}
+	logit.DefaultLogger = logger
 
 	l, err := net.Listen("tcp", appConfig.Listen)
 	if err != nil {
@@ -44,6 +49,8 @@ func main() {
 	}
 
 	ser := server.New(rootCtx, "", server.WithLogitLogger(logger))
+
+	ser.RegisterOnShutdown(closeFunc)
 
 	actions.HttpRouter(ser)
 
